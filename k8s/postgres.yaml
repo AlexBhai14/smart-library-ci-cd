@@ -1,0 +1,159 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-db
+  namespace: smart-library
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-db
+  template:
+    metadata:
+      labels:
+        app: auth-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: authdb
+            - name: POSTGRES_USER
+              value: library
+            - name: POSTGRES_PASSWORD
+              value: library
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-db
+  namespace: smart-library
+spec:
+  selector:
+    app: auth-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: book-db
+  namespace: smart-library
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: book-db
+  template:
+    metadata:
+      labels:
+        app: book-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: bookdb
+            - name: POSTGRES_USER
+              value: library
+            - name: POSTGRES_PASSWORD
+              value: library
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: book-db
+  namespace: smart-library
+spec:
+  selector:
+    app: book-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: member-db
+  namespace: smart-library
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: member-db
+  template:
+    metadata:
+      labels:
+        app: member-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: memberdb
+            - name: POSTGRES_USER
+              value: library
+            - name: POSTGRES_PASSWORD
+              value: library
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: member-db
+  namespace: smart-library
+spec:
+  selector:
+    app: member-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: issue-db
+  namespace: smart-library
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: issue-db
+  template:
+    metadata:
+      labels:
+        app: issue-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: issuedb
+            - name: POSTGRES_USER
+              value: library
+            - name: POSTGRES_PASSWORD
+              value: library
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: issue-db
+  namespace: smart-library
+spec:
+  selector:
+    app: issue-db
+  ports:
+    - port: 5432
+      targetPort: 5432

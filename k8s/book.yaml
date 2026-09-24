@@ -10,7 +10,15 @@ spec:
       containers:
         - name: book-service
           image: smart-library-cnd-book-service:latest
-          ports: [{containerPort: 8093}]
+          ports:
+            - containerPort: 8093
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://book-db:5432/bookdb
+            - name: SPRING_DATASOURCE_USERNAME
+              value: library
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: library
 ---
 apiVersion: v1
 kind: Service

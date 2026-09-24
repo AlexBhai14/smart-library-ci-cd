@@ -10,7 +10,15 @@ spec:
       containers:
         - name: auth-service
           image: smart-library-cnd-auth-service:latest
-          ports: [{containerPort: 8092}]
+          ports:
+            - containerPort: 8092
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://auth-db:5432/authdb
+            - name: SPRING_DATASOURCE_USERNAME
+              value: library
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: library
 ---
 apiVersion: v1
 kind: Service
