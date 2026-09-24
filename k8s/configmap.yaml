@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: library-config
+  namespace: smart-library
+data:
+  SPRING_PROFILES_ACTIVE: "docker"
+  API_GATEWAY_URL: "http://api-gateway:8091"

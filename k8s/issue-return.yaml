@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: issue-return-service, namespace: smart-library}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: issue-return-service}}
+  template:
+    metadata: {labels: {app: issue-return-service}}
+    spec:
+      containers:
+        - name: issue-return-service
+          image: smart-library-cnd-issue-return-service:latest
+          ports: [{containerPort: 8095}]
+---
+apiVersion: v1
+kind: Service
+metadata: {name: issue-return-service, namespace: smart-library}
+spec:
+  selector: {app: issue-return-service}
+  ports: [{port: 8095, targetPort: 8095}]

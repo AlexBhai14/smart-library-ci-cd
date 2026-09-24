@@ -1,0 +1,91 @@
+services:
+  auth-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: library
+      POSTGRES_PASSWORD: library
+    ports: ["5433:5432"]
+
+  book-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: bookdb
+      POSTGRES_USER: library
+      POSTGRES_PASSWORD: library
+    ports: ["5434:5432"]
+
+  member-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: memberdb
+      POSTGRES_USER: library
+      POSTGRES_PASSWORD: library
+    ports: ["5435:5432"]
+
+  issue-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: issuedb
+      POSTGRES_USER: library
+      POSTGRES_PASSWORD: library
+    ports: ["5436:5432"]
+
+  auth-service:
+    build: ./auth-service
+    environment:
+      SERVER_PORT: 8092
+      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/authdb
+      SPRING_DATASOURCE_USERNAME: library
+      SPRING_DATASOURCE_PASSWORD: library
+    depends_on: [auth-db]
+    ports: ["8092:8092"]
+
+  book-service:
+    build: ./book-service
+    environment:
+      SERVER_PORT: 8093
+      SPRING_DATASOURCE_URL: jdbc:postgresql://book-db:5432/bookdb
+      SPRING_DATASOURCE_USERNAME: library
+      SPRING_DATASOURCE_PASSWORD: library
+    depends_on: [book-db]
+    ports: ["8093:8093"]
+
+  member-service:
+    build: ./member-service
+    environment:
+      SERVER_PORT: 8094
+      SPRING_DATASOURCE_URL: jdbc:postgresql://member-db:5432/memberdb
+      SPRING_DATASOURCE_USERNAME: library
+      SPRING_DATASOURCE_PASSWORD: library
+    depends_on: [member-db]
+    ports: ["8094:8094"]
+
+  issue-return-service:
+    build: ./issue-return-service
+    environment:
+      SERVER_PORT: 8095
+      SPRING_DATASOURCE_URL: jdbc:postgresql://issue-db:5432/issuedb
+      SPRING_DATASOURCE_USERNAME: library
+      SPRING_DATASOURCE_PASSWORD: library
+    depends_on: [issue-db, book-service, member-service]
+    ports: ["8095:8095"]
+
+  api-gateway:
+    build: ./api-gateway
+    environment:
+      SERVER_PORT: 8091
+      AUTH_URL: http://auth-service:8092
+      BOOK_URL: http://book-service:8093
+      MEMBER_URL: http://member-service:8094
+      ISSUE_URL: http://issue-return-service:8095
+    depends_on: [auth-service, book-service, member-service, issue-return-service]
+    ports: ["8091:8091"]
+
+  frontend-service:
+    build: ./frontend-service
+    environment:
+      SERVER_PORT: 8090
+      API_GATEWAY_URL: http://api-gateway:8091
+    depends_on: [api-gateway]
+    ports: ["8090:8090"]

@@ -1,0 +1,973 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Smart Library - Admin</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+        header {
+            background: #172033;
+            color: white;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header b {
+            font-size: 20px;
+        }
+
+        main {
+            padding: 30px 7%;
+        }
+
+        .panel {
+            background: white;
+            padding: 22px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0,0,0,.07);
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        input,
+        select,
+        button {
+            padding: 11px 13px;
+            margin: 5px;
+            border-radius: 7px;
+            border: 1px solid #d4d9e2;
+            font-size: 14px;
+        }
+
+        input,
+        select {
+            min-width: 190px;
+        }
+
+        button {
+            background: #172033;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        button:hover {
+            opacity: .88;
+        }
+
+        .danger {
+            background: #c0392b;
+        }
+
+        .success {
+            background: #198754;
+        }
+
+        .logout {
+            background: #c0392b;
+        }
+
+        .message {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            padding: 11px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th {
+            background: #f7f8fa;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0,0,0,.06);
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        @media(max-width: 700px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 13px;
+            }
+
+            main {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <b>📚 Smart Library — Admin</b>
+    <button class="logout" id="logoutBtn" style="display:none"
+            onclick="logout()">Logout</button>
+</header>
+
+<main>
+
+    <!-- LOGIN -->
+    <div id="loginPanel" class="panel">
+        <h2>Admin Login</h2>
+
+        <input id="username"
+               placeholder="Username"
+               value="admin">
+
+        <input id="password"
+               type="password"
+               placeholder="Password"
+               value="admin123">
+
+        <button onclick="adminLogin()">Login</button>
+
+        <p id="loginMessage" class="message"></p>
+    </div>
+
+
+    <!-- DASHBOARD -->
+    <div id="dashboard" style="display:none">
+
+        <!-- STATS -->
+        <div class="stats">
+
+            <div class="stat">
+                <div>Total Books</div>
+                <div id="totalBooks" class="stat-number">0</div>
+            </div>
+
+            <div class="stat">
+                <div>Total Members</div>
+                <div id="totalMembers" class="stat-number">0</div>
+            </div>
+
+            <div class="stat">
+                <div>Active Issues</div>
+                <div id="activeIssues" class="stat-number">0</div>
+            </div>
+
+        </div>
+
+
+        <!-- ADD BOOK -->
+        <div class="panel">
+
+            <h2>📖 Add Book</h2>
+
+            <input id="title"
+                   placeholder="Book Title">
+
+            <input id="author"
+                   placeholder="Author">
+
+            <input id="category"
+                   placeholder="Category">
+
+            <input id="quantity"
+                   type="number"
+                   min="1"
+                   placeholder="Quantity">
+
+            <button onclick="addBook()">Add Book</button>
+
+        </div>
+
+
+        <!-- ADD MEMBER -->
+        <div class="panel">
+
+            <h2>👤 Add Member</h2>
+
+            <input id="memberName"
+                   placeholder="Name">
+
+            <input id="memberEmail"
+                   placeholder="Email">
+
+            <input id="memberPhone"
+                   placeholder="Phone">
+
+            <button onclick="addMember()">Add Member</button>
+
+        </div>
+
+
+        <!-- ISSUE BOOK -->
+        <div class="panel">
+
+            <h2>📚 Issue Book</h2>
+
+            <p>
+                Select a member and an available book.
+                Return date is automatically set to <b>7 days</b>.
+            </p>
+
+            <select id="memberSelect">
+                <option value="">Select Member</option>
+            </select>
+
+            <select id="bookSelect">
+                <option value="">Select Available Book</option>
+            </select>
+
+            <button class="success"
+                    onclick="issueBook()">
+                Issue Book
+            </button>
+
+            <p id="issueMessage" class="message"></p>
+
+        </div>
+
+
+        <!-- BOOKS -->
+        <div class="panel">
+
+            <h2>📖 Books</h2>
+
+            <div id="books"></div>
+
+        </div>
+
+
+        <!-- MEMBERS -->
+        <div class="panel">
+
+            <h2>👥 Members</h2>
+
+            <div id="members"></div>
+
+        </div>
+
+
+        <!-- ISSUES -->
+        <div class="panel">
+
+            <h2>🔄 Issue / Return Records</h2>
+
+            <div id="issues"></div>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<script>
+
+let authToken = "";
+
+
+/* =========================
+   LOGIN
+========================= */
+
+async function adminLogin() {
+
+    const username =
+        document.getElementById("username").value;
+
+    const password =
+        document.getElementById("password").value;
+
+    const message =
+        document.getElementById("loginMessage");
+
+    try {
+
+        const response = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        });
+
+        if (!response.ok) {
+            message.innerText = "Invalid username or password.";
+            return;
+        }
+
+        const data = await response.json();
+
+        authToken = data.token;
+
+        document.getElementById("loginPanel")
+            .style.display = "none";
+
+        document.getElementById("dashboard")
+            .style.display = "block";
+
+        document.getElementById("logoutBtn")
+            .style.display = "block";
+
+        await refresh();
+
+    } catch (error) {
+
+        message.innerText =
+            "Login failed. Please try again.";
+
+        console.error(error);
+    }
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+function logout() {
+
+    authToken = "";
+
+    document.getElementById("dashboard")
+        .style.display = "none";
+
+    document.getElementById("loginPanel")
+        .style.display = "block";
+
+    document.getElementById("logoutBtn")
+        .style.display = "none";
+}
+
+
+/* =========================
+   REFRESH EVERYTHING
+========================= */
+
+async function refresh() {
+
+    try {
+
+        const [
+            booksResponse,
+            membersResponse,
+            issuesResponse
+        ] = await Promise.all([
+            fetch("/api/books"),
+            fetch("/api/members"),
+            fetch("/api/issues")
+        ]);
+
+        const booksData =
+            await booksResponse.json();
+
+        const membersData =
+            await membersResponse.json();
+
+        const issuesData =
+            await issuesResponse.json();
+
+
+        renderBooks(booksData);
+
+        renderMembers(membersData);
+
+        renderIssues(issuesData);
+
+        populateMemberDropdown(membersData);
+
+        populateBookDropdown(booksData);
+
+        updateStats(
+            booksData,
+            membersData,
+            issuesData
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Refresh error:",
+            error
+        );
+    }
+}
+
+
+/* =========================
+   STATS
+========================= */
+
+function updateStats(
+    books,
+    members,
+    issues
+) {
+
+    document.getElementById("totalBooks")
+        .innerText = books.length;
+
+    document.getElementById("totalMembers")
+        .innerText = members.length;
+
+    const active =
+        issues.filter(
+            x => x.status === "ISSUED"
+        ).length;
+
+    document.getElementById("activeIssues")
+        .innerText = active;
+}
+
+
+/* =========================
+   MEMBER DROPDOWN
+========================= */
+
+function populateMemberDropdown(members) {
+
+    const select =
+        document.getElementById("memberSelect");
+
+    select.innerHTML =
+        '<option value="">Select Member</option>';
+
+    members.forEach(member => {
+
+        const option =
+            document.createElement("option");
+
+        option.value = member.id;
+
+        option.textContent =
+            "#" + member.id +
+            " — " +
+            member.name +
+            " — " +
+            member.email;
+
+        select.appendChild(option);
+    });
+}
+
+
+/* =========================
+   BOOK DROPDOWN
+========================= */
+
+function populateBookDropdown(books) {
+
+    const select =
+        document.getElementById("bookSelect");
+
+    select.innerHTML =
+        '<option value="">Select Available Book</option>';
+
+    books
+        .filter(
+            book =>
+                Number(book.availableQuantity) > 0
+        )
+        .forEach(book => {
+
+            const option =
+                document.createElement("option");
+
+            option.value = book.id;
+
+            option.textContent =
+                "#" + book.id +
+                " — " +
+                book.title +
+                " — Available: " +
+                book.availableQuantity;
+
+            select.appendChild(option);
+        });
+}
+
+
+/* =========================
+   ADD BOOK
+========================= */
+
+async function addBook() {
+
+    const title =
+        document.getElementById("title").value.trim();
+
+    const author =
+        document.getElementById("author").value.trim();
+
+    const category =
+        document.getElementById("category").value.trim();
+
+    const quantity =
+        Number(
+            document.getElementById("quantity").value
+        );
+
+    if (!title || !author || !category || quantity <= 0) {
+
+        alert(
+            "Please enter all book details."
+        );
+
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            "/api/books",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    title: title,
+                    author: author,
+                    category: category,
+                    quantity: quantity,
+                    availableQuantity: quantity
+                })
+            }
+        );
+
+        if (!response.ok) {
+
+            alert("Book could not be added.");
+
+            return;
+        }
+
+        document.getElementById("title").value = "";
+        document.getElementById("author").value = "";
+        document.getElementById("category").value = "";
+        document.getElementById("quantity").value = "";
+
+        await refresh();
+
+        alert("Book added successfully.");
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Error adding book.");
+    }
+}
+
+
+/* =========================
+   ADD MEMBER
+========================= */
+
+async function addMember() {
+
+    const name =
+        document.getElementById("memberName")
+            .value.trim();
+
+    const email =
+        document.getElementById("memberEmail")
+            .value.trim();
+
+    const phone =
+        document.getElementById("memberPhone")
+            .value.trim();
+
+    if (!name || !email || !phone) {
+
+        alert(
+            "Please enter all member details."
+        );
+
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            "/api/members",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    phone: phone
+                })
+            }
+        );
+
+        if (!response.ok) {
+
+            alert("Member could not be added.");
+
+            return;
+        }
+
+        document.getElementById("memberName").value = "";
+        document.getElementById("memberEmail").value = "";
+        document.getElementById("memberPhone").value = "";
+
+        await refresh();
+
+        alert("Member added successfully.");
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Error adding member.");
+    }
+}
+
+
+/* =========================
+   ISSUE BOOK
+========================= */
+
+async function issueBook() {
+
+    const memberId =
+        document.getElementById("memberSelect").value;
+
+    const bookId =
+        document.getElementById("bookSelect").value;
+
+    const message =
+        document.getElementById("issueMessage");
+
+    if (!memberId) {
+
+        message.innerText =
+            "Please select a member.";
+
+        return;
+    }
+
+    if (!bookId) {
+
+        message.innerText =
+            "Please select an available book.";
+
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            "/api/issues",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    memberId: Number(memberId),
+                    bookId: Number(bookId)
+                })
+            }
+        );
+
+        if (!response.ok) {
+
+            message.innerText =
+                "Book issue failed.";
+
+            return;
+        }
+
+
+        /* Update book availability */
+        const reserveResponse =
+            await fetch(
+                "/api/books/" +
+                bookId +
+                "/reserve",
+                {
+                    method: "POST"
+                }
+            );
+
+        if (!reserveResponse.ok) {
+
+            message.innerText =
+                "Issue created, but availability update failed.";
+
+            return;
+        }
+
+
+        message.innerText =
+            "Book issued successfully. Due date is 7 days from issue date.";
+
+        await refresh();
+
+    } catch (error) {
+
+        console.error(error);
+
+        message.innerText =
+            "Error while issuing book.";
+    }
+}
+
+
+/* =========================
+   RETURN BOOK
+========================= */
+
+async function returnBook(id) {
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/issues/" +
+                id +
+                "/return",
+                {
+                    method: "POST"
+                }
+            );
+
+        if (!response.ok) {
+
+            alert("Return failed.");
+
+            return;
+        }
+
+        const issue =
+            await response.json();
+
+
+        /* Increase book availability */
+        if (issue.bookId) {
+
+            await fetch(
+                "/api/books/" +
+                issue.bookId +
+                "/release",
+                {
+                    method: "POST"
+                }
+            );
+        }
+
+        await refresh();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Error while returning book.");
+    }
+}
+
+
+/* =========================
+   RENDER BOOKS
+========================= */
+
+function renderBooks(books) {
+
+    const container =
+        document.getElementById("books");
+
+    if (!books.length) {
+
+        container.innerHTML =
+            "<p>No books available.</p>";
+
+        return;
+    }
+
+    container.innerHTML = `
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Category</th>
+                <th>Availability</th>
+            </tr>
+
+            ${books.map(book => `
+                <tr>
+                    <td>${book.id}</td>
+                    <td>${book.title}</td>
+                    <td>${book.author}</td>
+                    <td>${book.category}</td>
+                    <td>
+                        ${book.availableQuantity}
+                        /
+                        ${book.quantity}
+                    </td>
+                </tr>
+            `).join("")}
+
+        </table>
+    `;
+}
+
+
+/* =========================
+   RENDER MEMBERS
+========================= */
+
+function renderMembers(members) {
+
+    const container =
+        document.getElementById("members");
+
+    if (!members.length) {
+
+        container.innerHTML =
+            "<p>No members available.</p>";
+
+        return;
+    }
+
+    container.innerHTML = `
+        <table>
+
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+            </tr>
+
+            ${members.map(member => `
+                <tr>
+                    <td>${member.id}</td>
+                    <td>${member.name}</td>
+                    <td>${member.email}</td>
+                    <td>${member.phone}</td>
+                </tr>
+            `).join("")}
+
+        </table>
+    `;
+}
+
+
+/* =========================
+   RENDER ISSUES
+========================= */
+
+function renderIssues(issues) {
+
+    const container =
+        document.getElementById("issues");
+
+    if (!issues.length) {
+
+        container.innerHTML =
+            "<p>No issue records found.</p>";
+
+        return;
+    }
+
+    container.innerHTML = `
+        <table>
+
+            <tr>
+                <th>ID</th>
+                <th>Member ID</th>
+                <th>Book ID</th>
+                <th>Issue Date</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+
+            ${issues.map(issue => `
+                <tr>
+
+                    <td>${issue.id}</td>
+
+                    <td>${issue.memberId}</td>
+
+                    <td>${issue.bookId}</td>
+
+                    <td>${issue.issueDate}</td>
+
+                    <td>${issue.dueDate}</td>
+
+                    <td>${issue.status}</td>
+
+                    <td>
+                        ${
+                            issue.status === "ISSUED"
+                            ?
+                            `<button
+                                class="danger"
+                                onclick="returnBook(${issue.id})">
+                                Return
+                            </button>`
+                            :
+                            "Returned"
+                        }
+                    </td>
+
+                </tr>
+            `).join("")}
+
+        </table>
+    `;
+}
+
+</script>
+
+</body>
+</html>

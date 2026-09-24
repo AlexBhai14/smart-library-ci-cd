@@ -1,0 +1,13 @@
+services:
+  auth-service:
+    build: ./auth-service
+  book-service:
+    build: ./book-service
+  member-service:
+    build: ./member-service
+  issue-return-service:
+    build: ./issue-return-service
+  api-gateway:
+    build: ./api-gateway
+  frontend-service:
+    build: ./frontend-service

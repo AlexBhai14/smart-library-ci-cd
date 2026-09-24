@@ -1,0 +1,5 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<modelVersion>4.0.0</modelVersion><groupId>com.smartlibrary</groupId><artifactId>smart-library</artifactId><version>1.0.0</version><packaging>pom</packaging>
+<modules><module>auth-service</module><module>book-service</module><module>member-service</module><module>issue-return-service</module><module>api-gateway</module><module>frontend-service</module></modules>
+</project>

@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: member-service, namespace: smart-library}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: member-service}}
+  template:
+    metadata: {labels: {app: member-service}}
+    spec:
+      containers:
+        - name: member-service
+          image: smart-library-cnd-member-service:latest
+          ports: [{containerPort: 8094}]
+---
+apiVersion: v1
+kind: Service
+metadata: {name: member-service, namespace: smart-library}
+spec:
+  selector: {app: member-service}
+  ports: [{port: 8094, targetPort: 8094}]
