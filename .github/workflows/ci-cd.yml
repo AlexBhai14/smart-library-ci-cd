@@ -51,27 +51,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Java setup for Docker job
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
           cache: maven
 
-      # Build JAR files again because this is a fresh GitHub runner
       - name: Package all services
         run: |
           for s in auth-service book-service member-service issue-return-service api-gateway frontend-service; do
             mvn -B -DskipTests package -f "$s/pom.xml"
           done
 
-      # Login to Docker Hub
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Build and push Docker images
       - name: Build and push images
         run: |
           for s in auth-service book-service member-service issue-return-service api-gateway frontend-service; do
@@ -83,25 +79,8 @@ jobs:
   deploy:
     needs: docker
     if: false
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: azure/setup-kubectl@v4
-
-      - name: Configure Kubernetes
-        env:
-          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
-        run: |
-          mkdir -p ~/.kube
-          echo "$KUBE_CONFIG_DATA" | base64 -d > ~/.kube/config
-
-      - name: Update image references
-        run: |
-          sed -i "s|IMAGE_PREFIX|${{ secrets.DOCKERHUB_USERNAME }}/smart-library|g" k8s/*.yaml
-          sed -i "s|IMAGE_TAG|${GITHUB_SHA::7}|g" k8s/*.yaml
-
-      - name: Deploy
-        run: |
-          kubectl apply -f k8s/
-          
+      - name: Skip Kubernetes deployment
+        run: echo "Kubernetes deployment skipped because the cluster is running locally on Docker Desktop"
